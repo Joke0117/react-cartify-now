@@ -1,26 +1,23 @@
 import { ShoppingCart, Search, User, Menu, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { useStore } from '@/lib/store';
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { useCarrito } from '../context/CarritoContext';
 
 export const Header = () => {
-  const { searchQuery, setSearchQuery, getCartCount, user } = useStore();
+  const { obtenerCantidadTotal } = useCarrito();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   
-  const cartCount = getCartCount();
+  const cartCount = obtenerCantidadTotal();
 
   const navItems = [
     { name: 'Inicio', path: '/' },
-    { name: 'Tienda', path: '/shop' },
-    { name: 'Ofertas', path: '/offers' },
-    { name: 'Contacto', path: '/contact' },
+    { name: 'Productos', path: '/producto' },
+    { name: 'Contacto', path: '/contacto' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,51 +53,35 @@ export const Header = () => {
         <div className="hidden md:flex flex-1 max-w-sm mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
+            <input
               type="search"
               placeholder="Buscar productos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center space-x-4">
-          {/* User Menu */}
-          <Button variant="ghost" size="icon" asChild>
-            <Link to={user ? '/profile' : '/login'}>
-              <User className="h-5 w-5" />
-            </Link>
-          </Button>
-
-          {/* Wishlist */}
-          <Button variant="ghost" size="icon">
-            <Heart className="h-5 w-5" />
-          </Button>
-
           {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative" asChild>
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs bg-primary text-primary-foreground">
-                  {cartCount}
-                </Badge>
-              )}
-            </Link>
-          </Button>
+          <Link to="/carrito" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
+          <button
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <Menu className="h-5 w-5" />
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -111,12 +92,12 @@ export const Header = () => {
             {/* Mobile Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
+              <input
                 type="search"
                 placeholder="Buscar productos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
