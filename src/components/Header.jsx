@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useCarrito } from '../context/CarritoContext';
 
-export const Header = () => {
+const Header = () => {
   const { obtenerCantidadTotal } = useCarrito();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -122,3 +122,5 @@ export const Header = () => {
     </header>
   );
 };
+
+export default Header;
