@@ -26,7 +26,7 @@ export const Cart = () => {
   
   const [couponCode, setCouponCode] = useState('');
 
-  const handleQuantityChange = (productId: string, newQuantity: number) => {
+  const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
       toast({

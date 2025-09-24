@@ -1,78 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  description: string;
-  image: string;
-  category: string;
-  brand: string;
-  stock: number;
-  rating: number;
-  reviews: number;
-  featured?: boolean;
-  onSale?: boolean;
-}
-
-export interface CartItem extends Product {
-  quantity: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  isAdmin?: boolean;
-}
-
-export interface Coupon {
-  code: string;
-  discount: number;
-  type: 'percentage' | 'fixed';
-  minAmount?: number;
-  isActive: boolean;
-}
-
-interface StoreState {
-  // Products
-  products: Product[];
-  setProducts: (products: Product[]) => void;
-  addProduct: (product: Product) => void;
-  updateProduct: (id: string, product: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
-
-  // Cart
-  cart: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  updateCartQuantity: (productId: string, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
-  clearCart: () => void;
-  getCartTotal: () => number;
-  getCartCount: () => number;
-
-  // Coupons
-  appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => boolean;
-  removeCoupon: () => void;
-  getDiscountAmount: () => number;
-  getFinalTotal: () => number;
-
-  // User
-  user: User | null;
-  setUser: (user: User | null) => void;
-
-  // Filters
-  selectedCategory: string;
-  searchQuery: string;
-  priceRange: [number, number];
-  setSelectedCategory: (category: string) => void;
-  setSearchQuery: (query: string) => void;
-  setPriceRange: (range: [number, number]) => void;
-}
-
 // Import product images
 import iphoneImage from '@/assets/iphone-15-pro.jpg';
 import macbookImage from '@/assets/macbook-pro.jpg';
@@ -82,14 +10,14 @@ import dellImage from '@/assets/dell-xps.jpg';
 import sonyImage from '@/assets/sony-headphones.jpg';
 
 // Mock coupons
-const mockCoupons: Coupon[] = [
+const mockCoupons = [
   { code: 'BIENVENIDO', discount: 10, type: 'percentage', isActive: true },
   { code: 'TECH20', discount: 20, type: 'percentage', minAmount: 100, isActive: true },
   { code: 'REGALO50', discount: 50, type: 'fixed', minAmount: 200, isActive: true },
 ];
 
 // Mock products
-const mockProducts: Product[] = [
+const mockProducts = [
   {
     id: '1',
     name: 'iPhone 15 Pro',
@@ -171,7 +99,7 @@ const mockProducts: Product[] = [
   },
 ];
 
-export const useStore = create<StoreState>()(
+export const useStore = create(
   persist(
     (set, get) => ({
       // Products
