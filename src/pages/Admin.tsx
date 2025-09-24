@@ -9,13 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useStore } from '@/lib/store';
+import { useStore, Product } from '@/lib/store';
 import { toast } from '@/hooks/use-toast';
 
 export const Admin = () => {
   const { products, addProduct, updateProduct, deleteProduct, cart, getCartTotal } = useStore();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState({
     name: '',
     price: '',
@@ -47,10 +47,10 @@ export const Admin = () => {
     setEditingProduct(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const productData = {
+    const productData: Omit<Product, 'id' | 'rating' | 'reviews' | 'featured' | 'onSale'> = {
       name: productForm.name,
       price: parseFloat(productForm.price),
       originalPrice: productForm.originalPrice ? parseFloat(productForm.originalPrice) : undefined,
@@ -74,7 +74,7 @@ export const Admin = () => {
         description: 'El producto se actualizó correctamente',
       });
     } else {
-      const newProduct = {
+      const newProduct: Product = {
         ...productData,
         id: Date.now().toString(),
         rating: 4.5,
@@ -92,7 +92,7 @@ export const Admin = () => {
     resetForm();
   };
 
-  const handleEdit = (product) => {
+  const handleEdit = (product: Product) => {
     setEditingProduct(product);
     setProductForm({
       name: product.name,
@@ -107,7 +107,7 @@ export const Admin = () => {
     setIsEditMode(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     deleteProduct(id);
     toast({
       title: 'Producto eliminado',
@@ -347,12 +347,108 @@ export const Admin = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>Editar Producto</DialogTitle>
+                                </DialogHeader>
+                                
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Nombre</label>
+                                      <Input
+                                        value={productForm.name}
+                                        onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Marca</label>
+                                      <Input
+                                        value={productForm.brand}
+                                        onChange={(e) => setProductForm({...productForm, brand: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Precio</label>
+                                      <Input
+                                        type="number"
+                                        value={productForm.price}
+                                        onChange={(e) => setProductForm({...productForm, price: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Precio Original (opcional)</label>
+                                      <Input
+                                        type="number"
+                                        value={productForm.originalPrice}
+                                        onChange={(e) => setProductForm({...productForm, originalPrice: e.target.value})}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Categoría</label>
+                                      <Select 
+                                        value={productForm.category} 
+                                        onValueChange={(value) => setProductForm({...productForm, category: value})}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Seleccionar categoría" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {categories.map((category) => (
+                                            <SelectItem key={category} value={category}>
+                                              {category}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">Stock</label>
+                                      <Input
+                                        type="number"
+                                        value={productForm.stock}
+                                        onChange={(e) => setProductForm({...productForm, stock: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium mb-2 block">URL de Imagen</label>
+                                    <Input
+                                      value={productForm.image}
+                                      onChange={(e) => setProductForm({...productForm, image: e.target.value})}
+                                      placeholder="/placeholder.svg"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium mb-2 block">Descripción</label>
+                                    <Textarea
+                                      value={productForm.description}
+                                      onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                                      rows={3}
+                                      required
+                                    />
+                                  </div>
+                                  <div className="flex gap-2 pt-4">
+                                    <Button type="submit" className="flex-1">
+                                      Actualizar Producto
+                                    </Button>
+                                  </div>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={() => handleDelete(product.id)}
                               className="text-destructive hover:text-destructive"
                             >
@@ -374,24 +470,72 @@ export const Admin = () => {
                 <CardTitle>Gestión de Pedidos</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Funcionalidad de pedidos en desarrollo...
-                </p>
+                <div className="text-center py-8">
+                  <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2">Sistema de Pedidos</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Para gestionar pedidos reales, conecta tu base de datos con Supabase.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Los pedidos actuales se procesan a través de WhatsApp.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="analytics" className="mt-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Analytics y Reportes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Panel de analytics en desarrollo...
-                </p>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Productos por Categoría</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {categories.map((category) => {
+                      const count = products.filter(p => p.category === category).length;
+                      const percentage = (count / totalProducts) * 100;
+                      return (
+                        <div key={category}>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm font-medium">{category}</span>
+                            <span className="text-sm text-muted-foreground">{count} productos</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Estado del Inventario</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span>Productos en stock alto (&gt;10)</span>
+                      <Badge>{products.filter(p => p.stock > 10).length}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Productos con stock bajo (1-5)</span>
+                      <Badge variant="secondary">{products.filter(p => p.stock >= 1 && p.stock <= 5).length}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Productos agotados</span>
+                      <Badge variant="destructive">{products.filter(p => p.stock === 0).length}</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

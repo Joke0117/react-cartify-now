@@ -22,7 +22,7 @@ export const Shop = () => {
   } = useStore();
   
   const [sortBy, setSortBy] = useState('featured');
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = ['', 'Smartphones', 'Laptops', 'Accesorios'];

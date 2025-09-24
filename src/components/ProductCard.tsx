@@ -2,14 +2,18 @@ import { Star, ShoppingCart, Heart, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useStore } from '@/lib/store';
+import { Product, useStore } from '@/lib/store';
 import { Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
-export const ProductCard = ({ product }) => {
+interface ProductCardProps {
+  product: Product;
+}
+
+export const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useStore();
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product);
